@@ -14,30 +14,31 @@ class Game {
         this.mapHeight = 600;
         this.tileSize = 20;
         
-        // Player
+        // Player - starts on the starting island (left side)
         this.player = {
-            x: 100,
+            x: 120,
             y: 300,
             width: 16,
             height: 16,
             speed: 2,
             hasWeapon: false,
-            color: '#3498db'
+            color: '#3498db',
+            isSwimming: false
         };
         
-        // Weapon
+        // Weapon - located on weapon island (center)
         this.weapon = {
-            x: 400,
-            y: 200,
+            x: 390,
+            y: 290,
             width: 12,
             height: 12,
             picked: false,
             glowTime: 0
         };
         
-        // Boss
+        // Boss - located on boss island (right side)
         this.boss = {
-            x: 650,
+            x: 620,
             y: 300,
             width: 32,
             height: 32,
@@ -63,28 +64,77 @@ class Game {
         const tilesX = Math.ceil(this.mapWidth / this.tileSize);
         const tilesY = Math.ceil(this.mapHeight / this.tileSize);
         
+        // Initialize map with water
         for (let y = 0; y < tilesY; y++) {
             this.map[y] = [];
             for (let x = 0; x < tilesX; x++) {
-                // Create island shape
-                const centerX = tilesX / 2;
-                const centerY = tilesY / 2;
-                const distanceFromCenter = Math.sqrt(
-                    Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
-                );
-                
-                // Island radius with some randomness for natural look
-                const islandRadius = Math.min(tilesX, tilesY) * 0.35;
-                const noise = (Math.sin(x * 0.5) + Math.cos(y * 0.5)) * 2;
-                
-                this.map[y][x] = distanceFromCenter < (islandRadius + noise) ? 1 : 0;
+                this.map[y][x] = 0; // Water
             }
         }
+        
+        // Create three separate islands
+        this.createStartingIsland(tilesX, tilesY);
+        this.createWeaponIsland(tilesX, tilesY);
+        this.createBossIsland(tilesX, tilesY);
         
         // Ensure starting positions are on land
         this.ensureLandAt(this.player.x, this.player.y);
         this.ensureLandAt(this.weapon.x, this.weapon.y);
         this.ensureLandAt(this.boss.x, this.boss.y);
+    }
+    
+    createStartingIsland(tilesX, tilesY) {
+        // Starting island on the left side
+        const centerX = tilesX * 0.2;
+        const centerY = tilesY * 0.5;
+        const radius = Math.min(tilesX, tilesY) * 0.15;
+        
+        for (let y = 0; y < tilesY; y++) {
+            for (let x = 0; x < tilesX; x++) {
+                const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                const noise = (Math.sin(x * 0.3) + Math.cos(y * 0.3)) * 1.5;
+                
+                if (distance < (radius + noise)) {
+                    this.map[y][x] = 1;
+                }
+            }
+        }
+    }
+    
+    createWeaponIsland(tilesX, tilesY) {
+        // Weapon island in the center
+        const centerX = tilesX * 0.5;
+        const centerY = tilesY * 0.5;
+        const radius = Math.min(tilesX, tilesY) * 0.12;
+        
+        for (let y = 0; y < tilesY; y++) {
+            for (let x = 0; x < tilesX; x++) {
+                const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                const noise = (Math.sin(x * 0.4) + Math.cos(y * 0.4)) * 1;
+                
+                if (distance < (radius + noise)) {
+                    this.map[y][x] = 1;
+                }
+            }
+        }
+    }
+    
+    createBossIsland(tilesX, tilesY) {
+        // Boss island on the right side
+        const centerX = tilesX * 0.8;
+        const centerY = tilesY * 0.5;
+        const radius = Math.min(tilesX, tilesY) * 0.18;
+        
+        for (let y = 0; y < tilesY; y++) {
+            for (let x = 0; x < tilesX; x++) {
+                const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                const noise = (Math.sin(x * 0.2) + Math.cos(y * 0.2)) * 2;
+                
+                if (distance < (radius + noise)) {
+                    this.map[y][x] = 1;
+                }
+            }
+        }
     }
     
     ensureLandAt(x, y) {
@@ -137,9 +187,10 @@ class Game {
     restartGame() {
         // Reset game state
         this.gameState = 'playing';
-        this.player.x = 100;
+        this.player.x = 120;
         this.player.y = 300;
         this.player.hasWeapon = false;
+        this.player.isSwimming = false;
         this.weapon.picked = false;
         this.boss.health = this.boss.maxHealth;
         this.attackCooldown = 0;
@@ -188,18 +239,27 @@ class Game {
         let newX = this.player.x;
         let newY = this.player.y;
         
-        if (this.keys['arrowleft'] || this.keys['a']) newX -= this.player.speed;
-        if (this.keys['arrowright'] || this.keys['d']) newX += this.player.speed;
-        if (this.keys['arrowup'] || this.keys['w']) newY -= this.player.speed;
-        if (this.keys['arrowdown'] || this.keys['s']) newY += this.player.speed;
+        // Calculate movement speed based on terrain
+        const moveSpeed = this.getMoveSpeed(this.player.x, this.player.y);
         
-        // Collision detection with map boundaries and water
+        if (this.keys['arrowleft'] || this.keys['a']) newX -= moveSpeed;
+        if (this.keys['arrowright'] || this.keys['d']) newX += moveSpeed;
+        if (this.keys['arrowup'] || this.keys['w']) newY -= moveSpeed;
+        if (this.keys['arrowdown'] || this.keys['s']) newY += moveSpeed;
+        
+        // Allow movement on both land and water (swimming)
         if (this.canMoveTo(newX, this.player.y)) {
             this.player.x = newX;
         }
         if (this.canMoveTo(this.player.x, newY)) {
             this.player.y = newY;
         }
+        
+        // Update swimming status
+        this.updateSwimmingStatus();
+        
+        // Update location status
+        this.updateLocationStatus();
         
         // Keep player within canvas bounds
         this.player.x = Math.max(0, Math.min(this.mapWidth - this.player.width, this.player.x));
@@ -213,17 +273,80 @@ class Game {
         }
     }
     
-    canMoveTo(x, y) {
-        // Check if the player can move to this position (must be on land)
+    getMoveSpeed(x, y) {
         const tileX = Math.floor((x + this.player.width / 2) / this.tileSize);
         const tileY = Math.floor((y + this.player.height / 2) / this.tileSize);
         
         if (tileX < 0 || tileX >= this.map[0].length || 
             tileY < 0 || tileY >= this.map.length) {
+            return this.player.speed;
+        }
+        
+        // Swimming in water is slower than walking on land
+        if (this.map[tileY][tileX] === 0) {
+            return this.player.speed * 0.6; // 60% speed in water
+        }
+        
+        return this.player.speed; // Full speed on land
+    }
+    
+    updateSwimmingStatus() {
+        const tileX = Math.floor((this.player.x + this.player.width / 2) / this.tileSize);
+        const tileY = Math.floor((this.player.y + this.player.height / 2) / this.tileSize);
+        
+        if (tileX >= 0 && tileX < this.map[0].length && 
+            tileY >= 0 && tileY < this.map.length) {
+            this.player.isSwimming = this.map[tileY][tileX] === 0;
+        } else {
+            this.player.isSwimming = false;
+        }
+    }
+    
+    updateLocationStatus() {
+        const tilesX = Math.ceil(this.mapWidth / this.tileSize);
+        const playerCenterX = this.player.x + this.player.width / 2;
+        
+        let location = "Swimming";
+        
+        if (!this.player.isSwimming) {
+            if (playerCenterX < tilesX * this.tileSize * 0.35) {
+                location = "Starting Island";
+            } else if (playerCenterX < tilesX * this.tileSize * 0.65) {
+                location = "Weapon Island";
+            } else {
+                location = "Boss Island";
+            }
+        }
+        
+        const locationElement = document.getElementById('locationStatus');
+        if (locationElement) {
+            locationElement.textContent = location;
+            
+            // Update background color based on location
+            if (this.player.isSwimming) {
+                locationElement.style.background = 'rgba(33, 150, 243, 0.8)';
+            } else if (location === "Starting Island") {
+                locationElement.style.background = 'rgba(76, 175, 80, 0.8)';
+            } else if (location === "Weapon Island") {
+                locationElement.style.background = 'rgba(255, 193, 7, 0.8)';
+            } else if (location === "Boss Island") {
+                locationElement.style.background = 'rgba(244, 67, 54, 0.8)';
+            }
+        }
+    }
+    
+    canMoveTo(x, y) {
+        // Allow movement on both land and water (swimming enabled)
+        const tileX = Math.floor((x + this.player.width / 2) / this.tileSize);
+        const tileY = Math.floor((y + this.player.height / 2) / this.tileSize);
+        
+        // Only restrict movement if completely outside map bounds
+        if (tileX < 0 || tileX >= this.map[0].length || 
+            tileY < 0 || tileY >= this.map.length) {
             return false;
         }
         
-        return this.map[tileY][tileX] === 1;
+        return true; // Can move on both land (1) and water (0)
     }
     
     isColliding(obj1, obj2) {
@@ -305,23 +428,45 @@ class Game {
     }
     
     renderPlayer() {
+        // Swimming effect - slight transparency and movement
+        const swimOffset = this.player.isSwimming ? Math.sin(Date.now() * 0.01) * 0.5 : 0;
+        const playerAlpha = this.player.isSwimming ? 0.8 : 1.0;
+        
+        this.ctx.save();
+        this.ctx.globalAlpha = playerAlpha;
+        
         // Player body
         this.ctx.fillStyle = this.player.color;
-        this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        this.ctx.fillRect(this.player.x, this.player.y + swimOffset, this.player.width, this.player.height);
         
         // Player face
         this.ctx.fillStyle = '#2980b9';
-        this.ctx.fillRect(this.player.x + 2, this.player.y + 2, this.player.width - 4, this.player.height - 4);
+        this.ctx.fillRect(this.player.x + 2, this.player.y + 2 + swimOffset, this.player.width - 4, this.player.height - 4);
         
         // Eyes
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.fillRect(this.player.x + 4, this.player.y + 4, 2, 2);
-        this.ctx.fillRect(this.player.x + 10, this.player.y + 4, 2, 2);
+        this.ctx.fillRect(this.player.x + 4, this.player.y + 4 + swimOffset, 2, 2);
+        this.ctx.fillRect(this.player.x + 10, this.player.y + 4 + swimOffset, 2, 2);
+        
+        // Swimming ripple effect
+        if (this.player.isSwimming) {
+            this.ctx.globalAlpha = 0.3;
+            this.ctx.strokeStyle = '#ffffff';
+            this.ctx.lineWidth = 1;
+            const rippleRadius = 12 + Math.sin(Date.now() * 0.02) * 4;
+            this.ctx.beginPath();
+            this.ctx.arc(this.player.x + this.player.width/2, 
+                        this.player.y + this.player.height/2 + swimOffset, 
+                        rippleRadius, 0, 2 * Math.PI);
+            this.ctx.stroke();
+        }
+        
+        this.ctx.restore();
         
         // Weapon indicator
         if (this.player.hasWeapon) {
             this.ctx.fillStyle = '#f39c12';
-            this.ctx.fillRect(this.player.x + this.player.width, this.player.y + 4, 8, 3);
+            this.ctx.fillRect(this.player.x + this.player.width, this.player.y + 4 + swimOffset, 8, 3);
         }
     }
     

@@ -83,6 +83,17 @@ body {
     border: 2px solid #fff;
 }
 
+.location-status {
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 2px 2px 0px #000;
+    background: rgba(52, 152, 219, 0.8);
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 2px solid #fff;
+    margin-bottom: 8px;
+}
+
 .game-screen {
     position: absolute;
     top: 0;
