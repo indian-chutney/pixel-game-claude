@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Island Adventure</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>Pixel Island Adventure</h1>
+            <div class="game-ui">
+                <div class="status-panel">
+                    <div class="player-status">
+                        <span class="weapon-status" id="weaponStatus">No Weapon</span>
+                    </div>
+                    <div class="boss-status">
+                        <span>Boss HP: </span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="bossHp"></div>
+                        </div>
+                        <span id="bossHpText">100/100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            <div class="game-message" id="gameMessage" style="display: none;"></div>
+        </div>
+        
+        <div class="controls">
+            <p><strong>Controls:</strong> Use Arrow Keys or WASD to move</p>
+            <p><strong>Goal:</strong> Find the weapon and defeat the boss!</p>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
