@@ -210,10 +210,17 @@ class Game {
             Math.pow(this.player.y - this.boss.y, 2)
         );
         
-        if (distance <= this.attackRange) {
-            this.boss.health -= 20;
+        if (distance <= this.attackRange + 0.1) {
+            // Deal 1 damage instead of 20 for single-use weapon system
+            this.boss.health -= 1;
             this.boss.lastDamageTime = Date.now();
             this.attackCooldown = 30; // 30 frames cooldown
+            
+            // Consume weapon after single use
+            this.player.hasWeapon = false;
+            
+            // Immediately respawn weapon on weapon island
+            this.respawnWeapon();
             
             if (this.boss.health <= 0) {
                 this.gameState = 'victory';
@@ -222,6 +229,13 @@ class Game {
             
             this.updateUI();
         }
+    }
+    
+    respawnWeapon() {
+        // Reset weapon to its original state on weapon island
+        this.weapon.picked = false;
+        this.weapon.x = 390;
+        this.weapon.y = 290;
     }
     
     update(deltaTime) {
