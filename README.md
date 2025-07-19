@@ -1,32 +1,55 @@
-# Pixel Island Adventure
+# Pixel Multi-Island Adventure
 
-A 2D pixel-style island adventure game where you explore an island, find a weapon, and defeat the boss!
+A 2D pixel-style multi-island adventure game where you swim between islands, find a weapon, and defeat the boss!
 
 ## How to Play
 
 1. **Start the Game**: Open `index.html` in your web browser
-2. **Movement**: Use WASD keys or Arrow Keys to move your character around the island
-3. **Find the Weapon**: Locate the glowing golden weapon on the island to arm yourself
-4. **Defeat the Boss**: Find the red boss enemy and get close enough to attack with SPACE
-5. **Victory**: Reduce the boss's HP to zero to win!
+2. **Movement**: Use WASD keys or Arrow Keys to move your character
+3. **Swimming**: Move through water to travel between islands (slower than walking)
+4. **Multi-Island Quest**: 
+   - Start on the **Starting Island** (left)
+   - Swim to **Weapon Island** (center) to pick up the golden weapon
+   - Swim to **Boss Island** (right) to confront the boss
+5. **Combat**: Get close to the boss and press SPACE to attack
+6. **Victory**: Reduce the boss's HP to zero to complete the adventure!
 
 ## Game Features
 
+- **Multi-Island Adventure**: Three distinct islands connected by swimmable water
+- **Swimming Mechanics**: Slower movement through water with visual effects
+- **Island Progression**: Starting Island → Weapon Island → Boss Island
+- **Location Tracking**: UI indicator showing current island or swimming status
 - **Pixel Art Style**: Retro-inspired pixel graphics with smooth animations
-- **Island Exploration**: Navigate around a procedurally generated island surrounded by water
 - **Weapon System**: Pick up weapons with visual feedback and status updates
 - **Boss Combat**: Engage in combat with a challenging boss enemy
 - **Health System**: Boss has a health bar that depletes as you attack
 - **Multiple Game States**: Start screen, gameplay, and victory screen
-- **Collision Detection**: Can't walk on water or through the boss
+- **Visual Swimming Effects**: Transparency, ripples, and movement animations
 - **Attack Range Indicator**: Visual indicator when you're close enough to attack
 
 ## Controls
 
 - **Movement**: WASD or Arrow Keys
+- **Swimming**: Same movement keys (automatically slower in water)
 - **Attack**: SPACE (when near boss with weapon)
 - **Start Game**: Click "Start Game" button
 - **Restart**: Click "Play Again" after victory
+
+## Island Guide
+
+- **🏝️ Starting Island** (Left): Where your adventure begins
+- **⚔️ Weapon Island** (Center): Find the golden weapon here
+- **👹 Boss Island** (Right): Face the final boss challenge
+- **🌊 Water**: Swim between islands (slower movement)
+
+## Multi-Island Adventure Flow
+
+1. **Starting Island**: Player spawns here, ready to begin the quest
+2. **Swim to Weapon Island**: Navigate through water to reach the center island
+3. **Collect the Weapon**: Pick up the glowing golden weapon
+4. **Swim to Boss Island**: Travel to the final destination
+5. **Boss Battle**: Defeat the red boss to complete your adventure!
 
 ## Technical Details
 

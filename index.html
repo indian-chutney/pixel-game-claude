@@ -15,6 +15,7 @@
                     <div class="health-bar-fill" id="bossHealth"></div>
                 </div>
             </div>
+            <div class="location-status" id="locationStatus">Starting Island</div>
             <div class="weapon-status" id="weaponStatus">Find a weapon!</div>
         </div>
         
@@ -23,18 +24,21 @@
         <div class="game-screen" id="startScreen">
             <h1>Pixel Island Adventure</h1>
             <p>Use WASD or Arrow Keys to move</p>
-            <p>Find a weapon and defeat the boss!</p>
+            <p>Swim between islands to find the weapon and defeat the boss!</p>
+            <p><strong>Quest:</strong> Starting Island → Weapon Island → Boss Island</p>
             <button id="startButton">Start Game</button>
         </div>
         
         <div class="game-screen" id="victoryScreen" style="display: none;">
             <h1>Victory!</h1>
-            <p>You have defeated the boss and saved the island!</p>
+            <p>You have completed the multi-island adventure!</p>
+            <p>You swam between islands, found the weapon, and defeated the boss!</p>
             <button id="restartButton">Play Again</button>
         </div>
         
         <div class="controls-info">
             <div>Move: WASD or Arrow Keys</div>
+            <div>Swim: Move through water (slower)</div>
             <div>Attack: SPACE (when near boss with weapon)</div>
         </div>
     </div>
